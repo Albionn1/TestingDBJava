@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -46,6 +47,7 @@ public class PunaGUI extends javax.swing.JFrame {
     private void initComponents() {
 
         jSeparator1 = new javax.swing.JSeparator();
+        jDialog1 = new javax.swing.JDialog();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
         addBtn = new javax.swing.JButton();
@@ -53,8 +55,18 @@ public class PunaGUI extends javax.swing.JFrame {
         editBtn = new javax.swing.JButton();
         loadBtn = new javax.swing.JButton();
         searchBtn = new javax.swing.JButton();
-        getSearchts = new javax.swing.JTextField();
         getIDtd = new javax.swing.JTextField();
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -65,7 +77,15 @@ public class PunaGUI extends javax.swing.JFrame {
             new String [] {
                 "ID", "Emri", "Mbiemri", "Departamenti", "Qyteti"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tabela.setShowGrid(true);
         jScrollPane1.setViewportView(tabela);
 
@@ -104,20 +124,18 @@ public class PunaGUI extends javax.swing.JFrame {
             }
         });
 
-        getSearchts.setText("Search");
-        getSearchts.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                getSearchtsActionPerformed(evt);
-            }
-        });
-
-        getIDtd.setText("ID to be deleted");
+        getIDtd.setText("Search, Delete or Update ID");
         getIDtd.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 getIDtdMouseEntered(evt);
             }
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 getIDtdMouseReleased(evt);
+            }
+        });
+        getIDtd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                getIDtdActionPerformed(evt);
             }
         });
 
@@ -135,7 +153,6 @@ public class PunaGUI extends javax.swing.JFrame {
                     .addComponent(deleteBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
                     .addComponent(editBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
                     .addComponent(searchBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
-                    .addComponent(getSearchts)
                     .addComponent(getIDtd))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
@@ -146,20 +163,18 @@ public class PunaGUI extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
-                .addGap(55, 55, 55)
+                .addGap(34, 34, 34)
                 .addComponent(addBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(31, 31, 31)
                 .addComponent(editBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(26, 26, 26)
                 .addComponent(deleteBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(35, 35, 35)
                 .addComponent(loadBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(34, 34, 34)
                 .addComponent(searchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(59, 59, 59)
                 .addComponent(getIDtd, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(getSearchts, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -186,15 +201,15 @@ public class PunaGUI extends javax.swing.JFrame {
     public boolean IdExists(){
         String id = getIDtd.getText();
         try{
-        String sql = "SELECT * FROM Punetoret WHERE ID = ?";
-        PreparedStatement pst = con.prepareStatement(sql);
-        pst.setString(1, id);
-        ResultSet rs = pst.executeQuery();
-        if(rs.next()){
-           return true;
-        }else{
-            return false;
-        }
+            String sql = "SELECT * FROM Punetoret WHERE ID = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, id);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()){
+                return true;
+            }else{
+                return false;
+            }
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, "Error: " + e);
         }
@@ -228,7 +243,14 @@ public class PunaGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteBtnActionPerformed
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
-        // TODO add your handling code here:
+        EditData ed = new EditData();
+        if(!IdExists()){
+                JOptionPane.showMessageDialog(null, "Id nuk ekziston");
+        }else if(getIDtd == null){
+                JOptionPane.showMessageDialog(null, "ID nuk duhet te jete bosh");
+        }else{
+        ed.setVisible(true);
+    }
     }//GEN-LAST:event_editBtnActionPerformed
 
     private void loadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadBtnActionPerformed
@@ -252,10 +274,6 @@ public class PunaGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_searchBtnActionPerformed
 
-    private void getSearchtsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getSearchtsActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_getSearchtsActionPerformed
-
     private void getIDtdMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_getIDtdMouseEntered
         // Do nothing for now
     }//GEN-LAST:event_getIDtdMouseEntered
@@ -264,6 +282,17 @@ public class PunaGUI extends javax.swing.JFrame {
         getIDtd.setText("");
     }//GEN-LAST:event_getIDtdMouseReleased
 
+    private void getIDtdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getIDtdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_getIDtdActionPerformed
+
+    public String getGetIDtd() {
+        return getIDtd.getText();
+    }
+
+ 
+
+    
     /**
      * @param args the command line arguments
      */
@@ -306,7 +335,7 @@ public class PunaGUI extends javax.swing.JFrame {
     private javax.swing.JButton deleteBtn;
     private javax.swing.JButton editBtn;
     private javax.swing.JTextField getIDtd;
-    private javax.swing.JTextField getSearchts;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JButton loadBtn;
